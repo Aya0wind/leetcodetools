@@ -201,6 +201,8 @@ public:
     binTree()
         : m_root(nullptr){};
 
+    binTree(TreeNode* node)
+        : m_root(node){};
     [[maybe_unused]] explicit binTree(const string& str)
         : m_root(nullptr)
     {
@@ -371,9 +373,10 @@ template <fundamental T>
     printLinkedList(root);
 }
 
-[[maybe_unused]] void print(const binTree& root)
+[[maybe_unused]] void print(TreeNode* root)
 {
-    std::cout << root.flatBinTreeToStr();
+    binTree tree(root);
+    std::cout << tree.flatBinTreeToStr();
 }
 
 #endif  // LEETCODECPP_UTILITY_HPP
