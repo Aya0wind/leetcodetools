@@ -1,40 +1,44 @@
-#include <string_view>
-#include <numeric>
 #include "utility.hpp"
 #include <algorithm>
-
-using namespace tools;
+#include <numeric>
+using std::vector;
+using std::string;
+using std::hash;
+using std::array;
+using std::accumulate;
+using std::unordered_map;
+using std::operator""s;
 class Solution {
 public:
-    static TreeNode* buildTreeImpl(const int* first,const int* last,vector<int>& rootSequnce,int& lastRoot){
-        if(first==last){
-            return nullptr;
-        }
-        if(last-first==1){
-            --lastRoot;
-            return new TreeNode(*first);
-        }
-        int end= rootSequnce[lastRoot];
-        auto divide=std::find(first,last,end);
-        auto root=new TreeNode(*divide);
-        --lastRoot;
-        root->right=buildTreeImpl(divide+1,last,rootSequnce,lastRoot);
-        root->left=buildTreeImpl(first,divide,rootSequnce,lastRoot);
-        return root;
-    }
+    vector<vector<string>> groupAnagrams(const vector<string>& strs) {
+        // 自定义对 array<int, 26> 类型的哈希函数
+        auto arrayHash = [] (const array<int, 26>& arr) -> size_t {
+            return accumulate(arr.begin(), arr.end(), 0u, [&](size_t acc, int num) {
+                return (acc << 1) ^ hash<int>()(num);
+            });
+        };
 
-    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
-        if(inorder.empty()){
-            return nullptr;
+        unordered_map<array<int, 26>, vector<string>, decltype(arrayHash)> mp(0, arrayHash);
+        for (auto& str: strs) {
+            array<int, 26> counts{};
+            int length = str.length();
+            for (int i = 0; i < length; ++i) {
+                counts[str[i] - 'a'] ++;
+            }
+            mp[counts].emplace_back(str);
         }
-        int lastRoot=postorder.size()-1;
-        return buildTreeImpl(inorder.data(),inorder.data()+inorder.size(),postorder,lastRoot);
+        vector<vector<string>> ans;
+        for (auto it = mp.begin(); it != mp.end(); ++it) {
+            ans.emplace_back(it->second);
+        }
+        return ans;
     }
 };
 
+
 int main(){
-   Solution a;
-   auto vec1=vector{9,3,15,20,7};
-   auto vec2=vector{9,15,7,20,3};
-   print(a.buildTree(vec1,vec2));
+    Solution a;
+    tools::binTree b("[1,3,4,2,5,6,6]");
+    auto list=tools::LinkedList({1,2,3,4,2,5});
+    tools::print(list);
 }
