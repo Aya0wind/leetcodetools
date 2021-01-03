@@ -12,7 +12,7 @@ using namespace tools;
 class Solution {
 public:
    
-    }
+    
 };
 int main()
 {
