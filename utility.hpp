@@ -6,8 +6,8 @@
 #include <ranges>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 namespace tools {
 
@@ -21,26 +21,32 @@ struct ListNode {
     }
 };
 
-class LinkedList{
+class LinkedList {
     ListNode* head;
+    bool free = true;
 
 public:
     LinkedList(const std::initializer_list<int>& list)
     {
-        ::std::vector num(list);
-        if (num.empty())
-        {
-            head= nullptr;
+        auto begin = list.begin();
+        auto end = list.end();
+        if (list.size() == 0) {
+            head = nullptr;
             return;
         }
         else {
-            head = new ListNode(num[ 0 ]);
+            head = new ListNode(*begin++);
             ListNode* curNode = head;
-            for (int i = 1; i < num.size(); i++) {
-                curNode->next = new ListNode(num[ i ]);
+            for (; begin != end; ++begin) {
+                curNode->next = new ListNode(*begin);
                 curNode = curNode->next;
             }
         }
+    }
+    explicit LinkedList(ListNode* raw)
+        : head(raw)
+        , free(false)
+    {
     }
 
     [[nodiscard]] std::string to_string() const
@@ -48,7 +54,10 @@ public:
         std::stringstream ss;
         ListNode* curNode = head;
         while (curNode != nullptr) {
-            ss << curNode->val << " -> ";
+            ss << curNode->val;
+            if (curNode->next) {
+                ss << " -> ";
+            }
             curNode = curNode->next;
         }
         ss << "nullptr";
@@ -57,18 +66,21 @@ public:
 
     ~LinkedList()
     {
-        ListNode* curNode = head;
-        while (curNode != nullptr) {
-            ListNode* delNode = curNode;
-            curNode = curNode->next;
-            delete delNode;
+        if (free) {
+            ListNode* curNode = head;
+            while (curNode != nullptr) {
+                ListNode* delNode = curNode;
+                curNode = curNode->next;
+                delete delNode;
+            }
         }
     }
-    ListNode* getRoot(){
+
+    ListNode* getRoot()
+    {
         return this->head;
     }
 };
-
 
 struct TreeNode {
     int val;
@@ -82,7 +94,7 @@ struct TreeNode {
     }
 };
 
-class binTree {
+class [[maybe_unused]] BinaryTree {
 private:
     TreeNode* m_root;
     inline static constexpr auto NULLPTR_VAR = std::numeric_limits<int>::max();
@@ -189,7 +201,8 @@ private:
         return std::max(treeHeight(root->left), treeHeight(root->right)) + 1;
     }
 
-    void writeRootToBoard(TreeNode* root, int height, int left, int right, ::std::vector<::std::vector<::std::string>>& board) const
+    void writeRootToBoard(
+        TreeNode* root, int height, int left, int right, ::std::vector<::std::vector<::std::string>>& board) const
     {
         if (root == nullptr)
             return;
@@ -199,24 +212,26 @@ private:
         writeRootToBoard(root->right, height + 1, mid + 1, right, board);
     }
 
-    [[maybe_unused]] ::std::vector<::std::vector<::std::string>> writeTreeToBoard(TreeNode* root, ::std::vector<::std::vector<::std::string>>& board) const
+    [[maybe_unused]] ::std::vector<::std::vector<::std::string>>
+    writeTreeToBoard(TreeNode* root, ::std::vector<::std::vector<::std::string>>& board) const
     {
         int height = treeHeight(root);
-        board = ::std::vector<::std::vector<::std::string>>(height, ::std::vector<::std::string>(std::pow(2, height) - 1, ""));
+        board = ::std::vector<::std::vector<::std::string>>(
+            height, ::std::vector<::std::string>(std::pow(2, height) - 1, ""));
         writeRootToBoard(root, 0, 0, static_cast<int>(std::pow(2, height) - 2), board);
         return board;
     }
 
 public:
-    binTree()
+    BinaryTree()
         : m_root(nullptr){};
 
-    [[maybe_unused]] explicit binTree(const ::std::string& str)
+    [[maybe_unused]] explicit BinaryTree(const ::std::string& str)
         : m_root(nullptr)
     {
         setBinTree(str);
     };
-    ~binTree()
+    ~BinaryTree()
     {
         freeNode(m_root);
     };
@@ -239,7 +254,7 @@ public:
         ::std::vector<::std::string> flatStrList = convertStrList(flatIntList);
         if (flatStrList.empty())
             return "[]";
-        for (auto&& str : flatStrList){
+        for (auto&& str : flatStrList) {
             flatStr += str;
             flatStr += ',';
         }
@@ -247,147 +262,165 @@ public:
         return flatStr;
     }
 
-    [[maybe_unused]] [[nodiscard]] ::std::string to_string() const{
+    [[maybe_unused]] [[nodiscard]] ::std::string to_string() const
+    {
         return this->flatBinTreeToStr();
     }
-    
+
     [[maybe_unused]] TreeNode* getTree()
     {
         return m_root;
     }
-    explicit operator TreeNode*(){
+    explicit operator TreeNode*()
+    {
         return this->m_root;
     }
-
 };
-
-
-
-
 
 template <class T>
-concept fundamental = ::std::is_fundamental_v<std::remove_cvref_t<T>>;
-
-
-
-
-
-
-template<class T>
-concept ToString=requires{
-    {std::declval<T>().to_string()}->std::convertible_to<std::string>;
+concept StdToString = requires(T t)
+{
+    {
+        std::to_string(t)
+    }
+    ->std::convertible_to<std::string>;
 };
 
-template<class T>
-concept Container=requires{
-    std::ranges::input_range<T>&&std::convertible_to<T,::std::string>;
+template <class T>
+concept SelfToString = requires(T t)
+{
+    {
+        std::declval<T>().to_string()
+    }
+    ->std::convertible_to<std::string>;
 };
 
-template <class T,class value=typename std::remove_cvref<T>::type>
-concept Printable = requires{
-    Container<value>||fundamental<value>||std::convertible_to<value,::std::string>||ToString<value>;
-};
+template <class T>
+concept ToString = StdToString<T> || SelfToString<T> || std::convertible_to<std::string, std::remove_cvref_t<T>>;
 
+template <class T>
+concept Container = std::ranges::input_range<std::remove_cvref_t<T>>;
 
+template <class T>
+concept Printable = Container<T> || ToString<T>;
 
+class Printer {
+    using sepratorString = std::basic_string_view<char>;
+    sepratorString separatorChar;
+    sepratorString leftBraceChar;
+    sepratorString rightBraceChar;
 
-class Printer{
-    using utf8string=std::basic_string_view<char>;
-    utf8string separatorChar;
-    utf8string leftBraceChar;
-    utf8string rightBraceChar;
 public:
-    constexpr Printer():separatorChar(","),leftBraceChar("["),rightBraceChar("]"){}
-    [[nodiscard]] const utf8string& getSeparatorChar() const
+    constexpr Printer()
+        : separatorChar(",")
+        , leftBraceChar("[")
+        , rightBraceChar("]")
+    {
+    }
+    [[nodiscard]] const sepratorString& getSeparatorChar() const
     {
         return separatorChar;
     }
-    void setSeparatorChar(const utf8string& separatorChar)
+    [[maybe_unused]] void setSeparatorChar(const sepratorString& ch)
     {
-        Printer::separatorChar = separatorChar;
+        Printer::separatorChar = ch;
     }
-    [[nodiscard]] const utf8string& getLeftBraceChar() const
+    [[nodiscard]] const sepratorString& getLeftBraceChar() const
     {
         return leftBraceChar;
     }
-    void setLeftBraceChar(const utf8string& leftBraceChar)
+    [[maybe_unused]] void setLeftBraceChar(const sepratorString& ch)
     {
-        Printer::leftBraceChar = leftBraceChar;
+        Printer::leftBraceChar = ch;
     }
-    [[nodiscard]] const utf8string& getRightBraceChar() const
+    [[nodiscard]] const sepratorString& getRightBraceChar() const
     {
         return rightBraceChar;
     }
-    void setRightBraceChar(const utf8string& rightBraceChar)
+    [[maybe_unused]] void setRightBraceChar(const sepratorString& ch)
     {
-        Printer::rightBraceChar = rightBraceChar;
+        Printer::rightBraceChar = ch;
     }
 };
 
 [[maybe_unused]] inline constexpr static Printer defaultPrinter;
 
+template <ToString T>
+inline ::std::string format_string(const T& t)
+{
+    using NoCvrT = std::remove_cvref_t<T>;
+    if constexpr (std::convertible_to<std::string, NoCvrT>) {
+        return std::string(t);
+    }
+    else if constexpr (SelfToString<T>) {
+        return t.to_string();
+    }
+    else {
+        return std::to_string(t);
+    }
+}
 
 template <class Range>
-requires ::std::ranges::input_range<Range>
-    [[maybe_unused]] ::std::string format(Range&& r,int deep,const Printer& printer=defaultPrinter){
+requires ::std::ranges::input_range<Range> [[maybe_unused]] inline ::std::string
+format(Range&& r, int deep, const Printer& printer = defaultPrinter)
+{
     using value_type = ::std::ranges::range_value_t<std::remove_cvref_t<Range>>;
-    auto separatorChar=printer.getSeparatorChar();
-    auto leftBraceChar=printer.getLeftBraceChar();
-    auto rightBraceChar=printer.getRightBraceChar();
+    auto separatorChar = printer.getSeparatorChar();
+    auto leftBraceChar = printer.getLeftBraceChar();
+    auto rightBraceChar = printer.getRightBraceChar();
     ::std::stringstream os;
-    if constexpr (fundamental<value_type>) {
-        os<<leftBraceChar;
+    if constexpr (std::convertible_to<value_type, std::string> || std::convertible_to<value_type, std::string_view>) {
+        os << leftBraceChar;
         for (auto&& e : r) {
-            os << e << separatorChar;
+            os << '\"' << e << '\"' << separatorChar;
         }
-        os<<'\b'<<rightBraceChar;
-    }else if constexpr (std::convertible_to<value_type,std::string>||std::convertible_to<value_type,std::string_view>){
-        os<<leftBraceChar;
-        for (auto&& e : r) {
-            os <<'\"'<< e<<'\"'<< separatorChar;
-        }
-        os<<'\b'<<rightBraceChar;
+
+        os << '\b' << rightBraceChar;
     }
-    else if constexpr (ToString<value_type>){
-        os<<leftBraceChar;
-        for (auto&& e : r) {
-            os << e.to_string() << separatorChar;
+    else if constexpr (Container<value_type>) {
+        for (int i = 0; i < deep; ++i) {
+            os << "    ";
         }
-        os<<'\b'<<rightBraceChar;
-    }else if constexpr (Container<value_type>) {
         os << leftBraceChar << '\n';
         for (auto&& e : r) {
-            for (int i=0;i<deep;++i){
-                os<< "    ";
+            for (int i = 0; i < deep; ++i) {
+                os << "    ";
             }
-            os << format(e,deep+1,printer) << separatorChar << '\n';
+            os << format(e, deep + 1, printer) << separatorChar << '\n';
+        }
+        for (int i = 0; i < deep; ++i) {
+            os << "    ";
         }
         os << rightBraceChar;
+    }
+    else if constexpr (ToString<value_type>) {
+        for (int i = 0; i < deep; ++i) {
+            os << "    ";
+        }
+        os << leftBraceChar;
+        for (auto&& e : r) {
+            os << format_string(e) << separatorChar;
+        }
+        os << '\b' << rightBraceChar;
     }
     return os.str();
 }
 
-template <Printable T>
-void format_print(const T& object,std::ostream& os=std::cerr){
-    using value=typename std::remove_cvref<T>::type;
-    constexpr bool is_std_printable=std::convertible_to<value,::std::string>||std::convertible_to<::std::string_view,value>;
-    if constexpr (is_std_printable||fundamental<value>){
-        os<<object<<'\n';
-    }
-    else if constexpr (ToString<value>){
-        os<<object.to_string()<<'\n';
-    }
-    else{
-
-    }
-}
-
-template <Printable T>
-[[maybe_unused]] void print(const T& t)
+template <Container T>
+inline void format_print(const T& object, std::ostream& os = std::cerr)
 {
-    format_print(t,std::cerr);
+    if constexpr (ToString<T>) {
+        os << format_string(object) << '\n';
+    }
+    else {
+        os << format(object, 0) << '\n';
+    }
 }
 
-
-
+template <Printable T>
+[[maybe_unused]] inline void print(const T& t)
+{
+    format_print(t, std::cerr);
 }
+
+}  // namespace tools
