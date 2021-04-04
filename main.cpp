@@ -1,57 +1,32 @@
-#include <algorithm>
-#include <numeric>
-#include <unordered_map>
-
+#include <deque>
+#include <iostream>
+#include <map>
+#include <stack>
 #include "utility.hpp"
-using std::accumulate;
-using std::array;
-using std::hash;
-using std::string;
-using std::unordered_map;
+using namespace tools;
 using std::vector;
 
-#include <iostream>
-using namespace tools;
+#include <unordered_map>
+
 class Solution {
 public:
-    ListNode* partition(ListNode* head, int x) {
-        ListNode* small=nullptr;
-        ListNode* big= nullptr;
-        ListNode* bighead= nullptr;
-        ListNode* smallhead= nullptr;
-        while(head){
-           if(head->val<x){
-               if (small){
-                   small->next=head;
-               }else{
-                   smallhead=head;
-               }
-               small=head;
-           }else{
-               if (big){
-                   big->next=head;
-               }else{
-                   bighead=head;
-               }
-               big=head;
-           }
-           head=head->next;
+    vector<int> twoSum(vector<int>& nums, int target) {
+        std::unordered_map<int, int> hashtable;
+        for (int i = 0; i < nums.size(); ++i) {
+            auto it = hashtable.find(target - nums[i]);
+            if (it != hashtable.end()) {
+                return {it->second, i};
+            }
+            hashtable[nums[i]] = i;
         }
-        if(!big)
-            return smallhead;
-        if(!small)
-            return bighead;
-        small->next=bighead;
-        big->next= nullptr;
-        return smallhead;
+        return {};
     }
 };
+
+
 int main()
 {
-    using std::operator""s;
-    using std::operator""sv;
-    Solution a;
-    LinkedList l{};
-    LinkedList res(a.partition(l.getRoot(),1));
-    print("123"sv);
+    Solution s;
+    auto v=vector{1,2,3,4,5};
+    print(s.twoSum(v,7));
 }

@@ -1,13 +1,11 @@
 #pragma once
-#include <cmath>
 #include <concepts>
 #include <iostream>
 #include <queue>
 #include <ranges>
 #include <sstream>
-#include <string>
 #include <type_traits>
-#include <vector>
+
 
 namespace tools {
 
@@ -23,7 +21,7 @@ struct ListNode {
 
 class LinkedList {
     ListNode* head;
-    bool free = true;
+    bool free;
 
 public:
     LinkedList(const std::initializer_list<int>& list)
@@ -43,7 +41,7 @@ public:
             }
         }
     }
-    explicit LinkedList(ListNode* raw)
+    [[maybe_unused]] explicit LinkedList(ListNode* raw)
         : head(raw)
         , free(false)
     {
@@ -54,31 +52,28 @@ public:
         std::stringstream ss;
         ListNode* curNode = head;
         while (curNode != nullptr) {
-            ss << curNode->val;
-            if (curNode->next) {
-                ss << " -> ";
-            }
+            ss << curNode->val<< " -> ";
             curNode = curNode->next;
         }
-        ss << "nullptr";
+        ss << "null";
         return ss.str();
     }
 
     ~LinkedList()
     {
-        if (free) {
             ListNode* curNode = head;
             while (curNode != nullptr) {
                 ListNode* delNode = curNode;
                 curNode = curNode->next;
                 delete delNode;
             }
-        }
     }
 
-    ListNode* getRoot()
+    ListNode* getHead()
     {
-        return this->head;
+        auto head=this->head;
+        this->head= nullptr;
+        return head;
     }
 };
 
@@ -360,11 +355,11 @@ inline ::std::string format_string(const T& t)
     }
 }
 
-template <class Range>
-requires ::std::ranges::input_range<Range> [[maybe_unused]] inline ::std::string
-format(Range&& r, int deep, const Printer& printer = defaultPrinter)
+template <Container C>
+requires ::std::ranges::input_range<C> [[maybe_unused]] inline ::std::string
+format(C&& r, int deep, const Printer& printer = defaultPrinter)
 {
-    using value_type = ::std::ranges::range_value_t<std::remove_cvref_t<Range>>;
+    using value_type = ::std::ranges::range_value_t<std::remove_cvref_t<C>>;
     auto separatorChar = printer.getSeparatorChar();
     auto leftBraceChar = printer.getLeftBraceChar();
     auto rightBraceChar = printer.getRightBraceChar();
@@ -406,7 +401,7 @@ format(Range&& r, int deep, const Printer& printer = defaultPrinter)
     return os.str();
 }
 
-template <Container T>
+template <Printable T>
 inline void format_print(const T& object, std::ostream& os = std::cerr)
 {
     if constexpr (ToString<T>) {
