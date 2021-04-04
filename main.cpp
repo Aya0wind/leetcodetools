@@ -22,6 +22,7 @@ public:
 
 int main()
 {
-    BinaryTree tree("[1,2,3,4,5]");
-    print(tree);
+    Solution s;
+    auto v=vector{1,2,3,4,5};
+    print(s.twoSum(v,7));
 }
