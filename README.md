@@ -38,7 +38,7 @@ int main()
 ```C++
 打印结果: [2,3]
 ```
-多维vector
++ 多维vector
 ```C++
 int main()
 {
