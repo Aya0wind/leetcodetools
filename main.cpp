@@ -1,7 +1,3 @@
-#include <deque>
-#include <iostream>
-#include <map>
-#include <stack>
 #include "utility.hpp"
 using namespace tools;
 using std::vector;
@@ -26,7 +22,6 @@ public:
 
 int main()
 {
-    Solution s;
-    auto v=vector{1,2,3,4,5};
-    print(s.twoSum(v,7));
+    BinaryTree tree("[1,2,3,4,5]");
+    print(tree);
 }
