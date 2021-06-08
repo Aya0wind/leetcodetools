@@ -5,7 +5,7 @@ ColumnLimit: 120
 
 BraceWrapping:
   # class定义后面
-  AfterClass: false
+  AfterClass: true
   # 控制语句后面
   AfterControlStatement: Never
   # enum定义后面
@@ -42,11 +42,11 @@ AccessModifierOffset: -4
 # 开括号(开圆括号、开尖括号、开方括号)后的对齐: Align, DontAlign, AlwaysBreak(总是在开括号后换行)
 AlignAfterOpenBracket: AlwaysBreak
 # 连续赋值时，对齐所有等号
-AlignConsecutiveAssignments: false
+AlignConsecutiveAssignments: None
 # 连续声明时，对齐所有声明的变量名
-AlignConsecutiveDeclarations: false
+AlignConsecutiveDeclarations: None
 # 左对齐逃脱换行(使用反斜杠换行)的反斜杠
-AlignOperands: Align
+AlignOperands: true
 # 对齐连续的尾随的注释
 AlignTrailingComments: true
 # 允许函数声明的所有参数在放在下一行
@@ -194,7 +194,7 @@ RawStringFormats:
 # 允许重新排版注释
 ReflowComments:    true
 # 允许排序#include
-SortIncludes:    true
+SortIncludes: CaseSensitive
 SortUsingDeclarations: true
 # 在C风格类型转换后添加空格
 SpaceAfterCStyleCast: false
@@ -218,7 +218,7 @@ SpacesInContainerLiterals:    true
 SpacesInCStyleCastParentheses: true
 # 在圆括号的(后和)前添加空格
 SpacesInParentheses: false
-# 在方括号的[后和]前添加空格，lamda表达式和未指明大小的数组的声明不受影响
+# 在方括号的[后和]前添加空格，lambda表达式和未指明大小的数组的声明不受影响
 SpacesInSquareBrackets:    true
 # 标准: Cpp03, Cpp11, Auto
 Standard:    Auto
