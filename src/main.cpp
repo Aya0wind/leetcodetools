@@ -106,4 +106,8 @@ int main()
     tools::println("input->{}",l1);
 
     tools::println("output->{}",LinkedList{Solution{}.removeElements(l1. getOwnedHead(),6)});
+
+    tools::println("vector:{}",v0);
+
 }
+
