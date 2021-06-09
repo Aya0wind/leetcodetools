@@ -1,122 +1,163 @@
 #pragma once
-#include <concepts>
 #include <queue>
 #include <optional>
 #include <string>
 #include <cmath>
 namespace tools {
 
-struct ListNode {
+namespace impl{
+template<class T>
+struct ListNodeGeneric {
     int val;
-    ListNode* next;
-    explicit ListNode(int x)
-        : val(x)
+    ListNodeGeneric* next;
+    explicit ListNodeGeneric(T x)
+        : val(std::move(x))
         , next(nullptr)
     {
     }
+    ListNodeGeneric(T x,ListNodeGeneric* next)
+        : val(std::move(x))
+        , next(next)
+    {
+    }
+    auto operator <=>(const ListNodeGeneric&other) const=default;
 };
 
-class LinkedList {
-public:
-    using value_type = int;
-    using reference = const int&;
-    using const_reference = const int&;
-    using size_type = size_t;
+template<class T>
+class ConstLinkedListGenericIterator{
 
-    LinkedList(const std::initializer_list<int>& list)
-        : listSize(list.size())
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type      = T;
+    using Node_t = ListNodeGeneric<value_type>;
+    using Nodeptr        = Node_t*;
+    using difference_type = ;
+    using pointer         = typename _Mylist::pointer;
+    using reference       = value_type&;
+
+    Node_t* pointer;
+};
+
+template<class T>
+class LinkedListGenericIterator:public ConstLinkedListGenericIterator<T>{
+    using value_type = typename ConstLinkedListGenericIterator<T>::value_type;
+    using Node_t = ListNodeGeneric<value_type>;
+};
+
+
+
+template<class T>
+class LinkedListGeneric {
+public:
+    using value_type = T;
+    using reference = const T&;
+    using const_reference = const T&;
+    using size_type = size_t;
+    using Node_t = ListNodeGeneric<value_type>;
+    using iterator = LinkedListGenericIterator;
+public:
+
+
+    LinkedListGeneric(const std::initializer_list<value_type>& list)
+        :listSize(list.size())
     {
         if (list.size() == 0) {
             this->head = nullptr;
             return;
         }
-        this->head = new ListNode(*list.begin());
-        ListNode* curNode = this->head;
+        this->head = new Node_t(*list.begin());
+        Node_t* curNode = this->head;
         for (auto&& element : list) {
-            curNode->next = new ListNode(element);
+            curNode->next = new Node_t(element);
             curNode = curNode->next;
         }
     }
 
-    LinkedList(const LinkedList& other)
+    LinkedListGeneric(const LinkedListGeneric& other)
         : listSize(other.listSize)
         , head(nullptr)
     {
         if (other.head) {
             auto otherHead = other.head;
-            this->head = new ListNode(otherHead->val);
+            this->head = new Node_t(otherHead->val);
             auto curHead = this->head;
             while (otherHead->next) {
-                curHead->next = new ListNode(otherHead->next->val);
+                curHead->next = new Node_t(otherHead->next->val);
                 curHead = curHead->next;
                 otherHead = otherHead->next;
             }
         }
     }
 
-    explicit LinkedList(ListNode* raw)
+    ~LinkedListGeneric()
     {
-        size_t newSize = countListSize(raw);
-        this->head = raw;
-        this->listSize = newSize;
+        while (head) {
+            Node_t* delNode = head;
+            head = head->next;
+            delete delNode;
+        }
+    }
+    LinkedListGeneric(LinkedListGeneric&& other)noexcept
+        : listSize(other.listSize)
+        , head(other.takeOwnedHead())
+    {
+        other.head=nullptr;
     }
 
-    void push_front(int val)
+    explicit LinkedListGeneric(Node_t* raw)
+        :head(raw),
+         listSize(countListSize(raw))
+    {
+    }
+
+
+
+    void push_front(value_type val)
     {
         if (this->head) {
             auto curHead = this->head;
             while (curHead->next) {
                 curHead = curHead->next;
             }
-            curHead->next = new ListNode(val);
+            curHead->next = new Node_t(std::move(val));
         }
         else {
-            head = new ListNode(val);
+            head = new Node_t(val);
         }
     }
 
-    [[nodiscard]] size_t size() const
+    [[nodiscard]] size_type size() const
     {
         return this->listSize;
     }
 
-    void push_back(int val)
+    void push_back(value_type&& val)
     {
         if (head) {
-            auto new_head = new ListNode(val);
+            auto new_head = new Node_t(std::forward<T>(val));
             new_head->next = head;
             head = new_head;
         }
         else {
-            head = new ListNode(val);
+            head = new Node_t(std::forward<T>(val));
         }
     }
 
-    ~LinkedList()
-    {
-        while (head) {
-            ListNode* delNode = head;
-            head = head->next;
-            delete delNode;
-        }
-    }
 
-    ListNode* getOwnedHead()
+    [[nodiscard]]
+    Node_t* takeOwnedHead()
     {
-        auto curHead = this->head;
+        Node_t* curHead = this->head;
         this->head = nullptr;
         return curHead;
     }
 
 private:
-    ListNode* head;
-    size_t listSize;
+    Node_t* head;
+    size_type listSize{};
 
-    friend std::string to_string(const LinkedList& list);
-
-    static size_t countListSize(ListNode* head)
+    static size_type countListSize(Node_t* head)
     {
-        size_t counter = 0;
+        size_type counter = 0;
         while (head) {
             counter += 1;
             head = head->next;
@@ -124,7 +165,10 @@ private:
         return counter;
     }
 };
+}
 
+using ListNode=impl::ListNodeGeneric<int>;
+using LinkedList=impl::LinkedListGeneric<int>;
 
 struct TreeNode {
     int val;
@@ -283,7 +327,7 @@ static std::vector<std::string> convertStrList(std::vector<std::optional<int>>& 
             flatStrList.emplace_back("null");
         }
         else {
-            flatStrList.push_back(std::to_string(var.value()));
+            flatStrList.emplace_back(std::to_string(var.value()));
         }
     }
     return flatStrList;

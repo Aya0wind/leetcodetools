@@ -24,32 +24,38 @@ concept IsStdString = std::same_as<std::string, std::remove_cvref_t<T>>;
 template <class T>
 concept Printable = Container<T> || Format<T>;
 
-[[nodiscard, maybe_unused]] inline std::string to_string(const LinkedList& list)
-{
-    std::string ss;
-    ListNode* curNode = list.head;
-    while (curNode) {
-        ss += std::to_string(curNode->val);
-        ss += " -> ";
-        curNode = curNode->next;
-    }
-    ss += "null";
-    return ss;
-}
-[[nodiscard, maybe_unused]] inline std::string to_string(const BinaryTree& tree)
-{
-    std::vector<std::optional<int>> flatIntList = flattenBinTree(tree);
-    std::vector<std::string> flatStrList = convertStrList(flatIntList);
-    std::string flatStr;
-    for (auto&& str : flatStrList) {
-        flatStr += str;
-        flatStr += ',';
-    }
-    return flatStr;
-}
 
 template <Printable... Types>
 [[maybe_unused]] void println(const std::string_view fmtStr, const Types&... args)
+{
+    std::cout << std::format(fmtStr, args...) << "\n";
+}
+
+template <Printable... Types>
+[[maybe_unused]] void println(std::ostream& out,const std::string_view fmtStr, const Types&... args)
+{
+    out << std::format(fmtStr, args...) << "\n";
+}
+
+template <Printable... Types>
+[[maybe_unused]] void print(const std::string_view fmtStr, const Types&... args)
+{
+    std::cout << std::format(fmtStr, args...);
+}
+template <Printable... Types>
+[[maybe_unused]] void print(std::ostream& out,const std::string_view fmtStr, const Types&... args)
+{
+    out << std::format(fmtStr, args...);
+}
+
+template <Printable... Types>
+[[maybe_unused]] void eprintln(const std::string_view fmtStr, const Types&... args)
+{
+    std::cerr << std::format(fmtStr, args...) << "\n";
+}
+
+template <Printable... Types>
+[[maybe_unused]] void eprint(const std::string_view fmtStr, const Types&... args)
 {
     std::cerr << std::format(fmtStr, args...) << "\n";
 }
@@ -148,7 +154,7 @@ struct [[maybe_unused]] formatter<std::tuple<T...>, CharT> {
                 *output++ = ',';
                 *output++ = ' ';
                 auto valueString = std::format("{}", value);
-                output = std::copy(valueString.begin(), valueString.end(), output);
+                output = range_copy(valueString,output);
             }
         };
         std::apply([ format_tuple ](auto&&... args) { ((format_tuple(args)), ...); }, value);
@@ -156,6 +162,12 @@ struct [[maybe_unused]] formatter<std::tuple<T...>, CharT> {
         return output;
     }
 };
+
+template<std::ranges::input_range IRng,class OutIter>
+auto range_copy(IRng&& input,OutIter output){
+    return std::copy(std::begin(input), std::end(input), output);
+}
+
 
 template <tools::Printable T1, tools::Printable T2, class CharT>
 struct [[maybe_unused]] formatter<std::pair<T1, T2>, CharT> {
@@ -170,12 +182,10 @@ struct [[maybe_unused]] formatter<std::pair<T1, T2>, CharT> {
         auto output = ctx.out();
         *output++ = '(';
         auto first = std::format("{}", value.first);
-        output = std::copy(first.begin(), first.end(), output);
-        *output++ = ' ';
-        *output++ = ':';
-        *output++ = ' ';
+        output = range_copy(first,output);
+        output=range_copy(" : ",output);
         auto second = std::format("{}", value.first);
-        output = std::copy(second.begin(), second.end(), output);
+        output = range_copy(second,output);
         *output++ = ')';
         return output;
     }

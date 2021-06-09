@@ -40,7 +40,6 @@ int main()
     tools::println("中文->{}","中文测试");
 
     auto v0=vector{1,2,3,4,5,6};
-
     auto v1=vector{
         vector{123,12,4,3},
         vector{123,12,4,3}
@@ -69,6 +68,7 @@ int main()
     auto map1=std::map<int,std::string>{};
     map1[1]="123";
     map1[2]="123";
+
 
 
     auto tuple=std::make_tuple(1,1.23345,"abcde");
@@ -102,10 +102,10 @@ int main()
                    1.23154687);
 
     LinkedList l1{1,2,6,3,4,5,6};
+std::list<int> k;
+    tools::eprint("input->{}",l1);
 
-    tools::println("input->{}",l1);
-
-    tools::println("output->{}",LinkedList{Solution{}.removeElements(l1. getOwnedHead(),6)});
+    tools::println("output->{}",LinkedList{Solution{}.removeElements(l1.takeOwnedHead(),6)});
 
     tools::println("vector:{}",v0);
 
