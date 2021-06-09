@@ -107,7 +107,7 @@ public:
 int main()
 {
     LinkedList list{1,2,3,4,5,6,7,8,9};
-    ListNode* node = list.takeOwnedHead();
+    ListNode* node = list.getOwnedHead();
     
     node=Solution{}.removeElements(node,6);
     
