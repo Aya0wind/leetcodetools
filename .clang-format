@@ -81,7 +81,7 @@ BreakBeforeBinaryOperators: NonAssignment
 #   Mozilla(除枚举、函数、记录定义，与Attach类似), Stroustrup(除函数定义、catch、else，与Attach类似),
 #   Allman(总是在大括号前换行), GNU(总是在大括号前换行，并对于控制语句的大括号增加额外的缩进), WebKit(在函数前换行), Custom
 #   注：这里认为语句块也属于函数
-BreakBeforeBraces: Stroustrup
+BreakBeforeBraces: Custom
 # 在三元运算符前换行
 BreakBeforeTernaryOperators: true
 # 在构造函数的初始化列表的逗号前换行
@@ -194,7 +194,7 @@ RawStringFormats:
 # 允许重新排版注释
 ReflowComments:    true
 # 允许排序#include
-SortIncludes: CaseSensitive
+SortIncludes: true
 SortUsingDeclarations: true
 # 在C风格类型转换后添加空格
 SpaceAfterCStyleCast: false

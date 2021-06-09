@@ -1,11 +1,11 @@
 #pragma once
-#include <concepts>
-#include <queue>
-#include <optional>
-#include <string>
 #include <cmath>
-namespace tools {
+#include <concepts>
+#include <optional>
+#include <queue>
+#include <string>
 
+namespace tools {
 struct ListNode {
     int val;
     ListNode* next;
@@ -16,7 +16,8 @@ struct ListNode {
     }
 };
 
-class LinkedList {
+class LinkedList
+{
 public:
     using value_type = int;
     using reference = const int&;
@@ -54,6 +55,20 @@ public:
         }
     }
 
+    LinkedList& operator=(LinkedList&& other) noexcept
+    {
+        this->head = other.head;
+        this->listSize = other.listSize;
+        return *this;
+    }
+
+    LinkedList(LinkedList&& other) noexcept
+        : listSize(other.listSize)
+        , head(other.takeOwnedHead())
+    {
+        other.head = nullptr;
+    }
+
     explicit LinkedList(ListNode* raw)
     {
         size_t newSize = countListSize(raw);
@@ -69,8 +84,7 @@ public:
                 curHead = curHead->next;
             }
             curHead->next = new ListNode(val);
-        }
-        else {
+        } else {
             head = new ListNode(val);
         }
     }
@@ -86,8 +100,7 @@ public:
             auto new_head = new ListNode(val);
             new_head->next = head;
             head = new_head;
-        }
-        else {
+        } else {
             head = new ListNode(val);
         }
     }
@@ -101,7 +114,7 @@ public:
         }
     }
 
-    ListNode* getOwnedHead()
+    ListNode* takeOwnedHead()
     {
         auto curHead = this->head;
         this->head = nullptr;
@@ -125,7 +138,6 @@ private:
     }
 };
 
-
 struct TreeNode {
     int val;
     TreeNode* left;
@@ -138,7 +150,8 @@ struct TreeNode {
     }
 };
 
-class BinaryTree {
+class BinaryTree
+{
 private:
     TreeNode* treeRootNode;
 
@@ -163,11 +176,9 @@ private:
 
             if (intStr == "null") {
                 intList.emplace_back(std::nullopt);
-            }
-            else if (intStr.empty()) {
+            } else if (intStr.empty()) {
                 continue;
-            }
-            else {
+            } else {
                 intList.emplace_back(stoi(intStr));
             }
             pos = tailPos;
@@ -190,8 +201,7 @@ private:
                 auto* newNode = new TreeNode(list[ i ].value());
                 if ((i % 2) != 0) {
                     parent->left = newNode;
-                }
-                else {
+                } else {
                     parent->right = newNode;
                 }
                 q.push(newNode);
@@ -261,8 +271,7 @@ public:
         TreeNode* ptn = q.front();
         if (ptn == nullptr) {
             flatIntList.emplace_back(std::nullopt);
-        }
-        else {
+        } else {
             flatIntList.emplace_back(ptn->val);
             q.push(ptn->left);
             q.push(ptn->right);
@@ -281,11 +290,10 @@ static std::vector<std::string> convertStrList(std::vector<std::optional<int>>& 
     for (auto var : flatIntList) {
         if (var == std::nullopt) {
             flatStrList.emplace_back("null");
-        }
-        else {
+        } else {
             flatStrList.push_back(std::to_string(var.value()));
         }
     }
     return flatStrList;
 }
-}
+}  // namespace tools
