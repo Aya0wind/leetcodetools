@@ -16,6 +16,8 @@ struct ListNode {
     }
 };
 
+
+
 class LinkedList
 {
 public:
@@ -257,7 +259,7 @@ public:
     friend std::vector<std::optional<int>> flattenBinTree(const BinaryTree& tree);
 };
 
-[[nodiscard]] std::vector<std::optional<int>> flattenBinTree(const BinaryTree& tree)
+[[nodiscard]]inline std::vector<std::optional<int>> flattenBinTree(const BinaryTree& tree)
 {
     std::vector<std::optional<int>> flatIntList;
     std::queue<TreeNode*> q;
@@ -284,7 +286,7 @@ public:
     return flatIntList;
 }
 
-static std::vector<std::string> convertStrList(std::vector<std::optional<int>>& flatIntList)
+inline std::vector<std::string> convertStrList(std::vector<std::optional<int>>& flatIntList)
 {
     std::vector<std::string> flatStrList;
     for (auto var : flatIntList) {
