@@ -1,0 +1,7 @@
+[
+{
+  "directory": "H:/vscodeprj/leetcodeCPP/build",
+  "command": "C:\\PROGRA~1\\LLVM\\bin\\CLANG_~1.EXE  @CMakeFiles/leetcodeCPP.dir/includes_CXX.rsp -g -Xclang -gcodeview -O0 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -std=gnu++20 -o CMakeFiles\\leetcodeCPP.dir\\src\\main.cpp.obj -c H:\\vscodeprj\\leetcodeCPP\\src\\main.cpp",
+  "file": "H:/vscodeprj/leetcodeCPP/src/main.cpp"
+}
+]
